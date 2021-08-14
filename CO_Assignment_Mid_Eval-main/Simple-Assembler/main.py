@@ -232,6 +232,110 @@ def assembler(instruction):
 
     else:
         raiseError(1)
+        
+
+def getAND(r1, r2, r3):
+    opCode = "01100"
+    exBits = "00"
+    list1 = [r1, r2, r3]
+    list2 = []
+
+    for i in (list1):
+        index = register_dist[i]
+        list2.append(index)
+
+    #Calculation Part#
+    registers[list2[0]] = int(
+        bin(registers[list2[1]] & registers[list2[2]]), 2)
+
+    #printing part#
+    final_bin = register_addr[list2[0]] + \
+        register_addr[list2[1]] + register_addr[list2[2]]
+    print(opCode + exBits + final_bin + "\n")
+
+
+def getOR(r1, r2, r3):
+    opCode = "01011"
+    exBits = "00"
+    list1 = [r1, r2, r3]
+    list2 = []
+
+    for i in (list1):
+        index = register_dist[i]
+        list2.append(index)
+
+    #Calculation Part#
+    registers[list2[0]] = int(
+        bin(registers[list2[1]] | registers[list2[2]]), 2)
+
+    #printing part#
+    final_bin = register_addr[list2[0]] + \
+        register_addr[list2[1]] + register_addr[list2[2]]
+    print(opCode + exBits + final_bin + "\n")
+
+
+def getXOR(r1, r2, r3):
+    opCode = "01010"
+    exBits = "00"
+    list1 = [r1, r2, r3]
+    list2 = []
+
+    for i in (list1):
+        index = register_dist[i]
+        list2.append(index)
+
+    #Calculation Part#
+    registers[list2[0]] = int(
+        bin(registers[list2[1]] ^ registers[list2[2]]), 2)
+
+    #printing part#
+    final_bin = register_addr[list2[0]] + \
+        register_addr[list2[1]] + register_addr[list2[2]]
+    print(opCode + exBits + final_bin + "\n")
+
+
+def shiftRIGHT(r1, imm):
+    opCode = "01000"
+    index = register_dist[r1]
+    regCode = register_addr[index]
+    immCode = format(imm, '08b')
+    print(opCode + regCode + immCode + "\n")
+    registers[index] = registers[index] >> imm
+
+
+def shiftLEFT(r1, imm):
+    opCode = "01001"
+    index = register_dist[r1]
+    regCode = register_addr[index]
+    immCode = format(imm, '08b')
+    print(opCode + regCode + immCode + "\n")
+    registers[index] = registers[index] << imm
+
+
+
+def halt():
+    opCode = "10011"
+    exBits = "0"*11
+    print(opCode + exBits + "\n")
+
+
+def getINVERT(r1, r2):
+    opCode = "01101"
+    exBits = "00000"
+    list1 = [r1, r2]
+    list2 = []
+
+    for i in (list1):
+        index = register_dist[i]
+        list2.append(index)
+
+    #Calculation Part#
+
+    registers[list2[0]] = ~(bin((registers[list2[1]])))
+
+    #printing part#
+    final_bin = register_addr[list2[0]] + register_addr[list2[1]]
+    print(opCode + exBits + final_bin + "\n")
 
 
 def load(r1, mem_add):
@@ -483,6 +587,61 @@ def TypeD(inst):
         return
     else:
         raiseError(10)
+        
+        
+def TypeE(inst):
+    if (len(inst) == 2 and inst[1] in labels):
+        return
+    else:
+        raiseError(10)
+
+
+def TypeF(inst):
+    if (len(inst) == 1):
+        return
+    else:
+        raiseError(10)
+
+
+def raiseError(n):
+    print(errors[n] + "\n")
+    exit(0)
+
+
+program_counter = 0
+content = []
+count = 0
+original_count = -1
+while True:
+    try:
+        line_count = input()
+        line_count = line_count.strip()
+        
+        if len(line_count) == 0 or line_count.isspace():
+            continue
+        content.append(line_count)
+        original_count += 1
+        if "var" in line_count:
+            continue
+        if ":" in line_count:
+            s = line_count.split()
+            s[0] = s[0].replace(":", "")
+            labels[s[0]] = original_count
+        count += 1
+    
+    except EOFError:
+        break
+
+
+while (program_counter < len(content)):
+    if content[program_counter].isspace():  # If empty string is read then continue the loop
+        continue
+    # perform operation(s) on given string
+    assembler(content[program_counter])
+    program_counter += 1
+
+if (halt_called == False):
+    raiseError(8)
 
 
     
