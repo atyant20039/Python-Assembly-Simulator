@@ -221,8 +221,7 @@ def assembler(instruction):
             raiseError(10)
         if (inst[0] in list_of_instructions):
             raiseError(10)
-        inst[0] = inst[0].replace(":", "")
-        labels[inst[0]] = str(format(program_counter, '08b'))
+        
         non_var_called = True
         if (len(inst) > 1):
             sub_inst = " ".join(inst[1:])
@@ -356,8 +355,8 @@ def unconditionalJump(mem_add):
     global program_counter
     opCode = "01111"
     exBits = "000"
-    memBits = format(program_counter, '08b')
-    program_counter = labels[mem_add] - 1
+    memBits = format(labels[mem_add], '08b')
+    program_counter = labels[mem_add]
     print(opCode + exBits + str(memBits) + "\n")
 
 
@@ -365,9 +364,9 @@ def jumplt(mem_add):
     global program_counter
     opCode = "10000"
     exBits = "000"
-    memBits = format(program_counter, '08b')
+    memBits = format(labels[mem_add], '08b')
 
-    program_counter = labels[mem_add] - 1
+    program_counter = labels[mem_add]
     print(opCode + exBits + str(memBits) + "\n")
 
 
@@ -375,9 +374,9 @@ def jumpgt(mem_add):
     global program_counter
     opCode = "10001"
     exBits = "000"
-    memBits = format(program_counter, '08b')
+    memBits = format(labels[mem_add], '08b')
 
-    program_counter = labels[mem_add] - 1
+    program_counter = labels[mem_add]
     print(opCode + exBits + str(memBits) + "\n")
 
 
@@ -385,9 +384,9 @@ def jumpeq(mem_add):
     global program_counter
     opCode = "10010"
     exBits = "000"
-    memBits = format(program_counter, '08b')
+    memBits = format(labels[mem_add], '08b')
 
-    program_counter = labels[mem_add] - 1
+    program_counter = labels[mem_add]
     print(opCode + exBits + str(memBits) + "\n")
 
 def add(r1, r2, r3):
@@ -611,7 +610,7 @@ def raiseError(n):
 program_counter = 0
 content = []
 count = 0
-original_count = -1
+
 while True:
     try:
         line_count = input()
@@ -620,13 +619,13 @@ while True:
         if len(line_count) == 0 or line_count.isspace():
             continue
         content.append(line_count)
-        original_count += 1
+        
         if "var" in line_count:
             continue
         if ":" in line_count:
             s = line_count.split()
             s[0] = s[0].replace(":", "")
-            labels[s[0]] = original_count
+            labels[s[0]] = count
         count += 1
     
     except EOFError:
