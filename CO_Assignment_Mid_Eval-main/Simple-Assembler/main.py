@@ -219,7 +219,8 @@ def assembler(instruction):
         global inside_label
         if (inside_label == True):
             raiseError(10)
-        if (inst[0] in list_of_instructions):
+        label_name = inst[0].replace(":","")
+        if (label_name in list_of_instructions):
             raiseError(10)
         
         non_var_called = True
