@@ -162,3 +162,16 @@ def simulator(instruction):
             value = format(reg1_value, '08b').zfill(16)
             plot_dict[mem_addr] = cycle
             memory[mem_addr] = value
+            
+            
+    if (type == "e"):
+        # Memory address converted to Integer from String
+        mem_addr = int(instruction[8:], 2)
+        if opcode == "01111":
+            program_counter = mem_addr
+        if opcode == "10000" and (temp_flag == "0000000000000100" or temp_flag == "0000000000001100"):
+            program_counter = mem_addr
+        if opcode == "10001" and (temp_flag == "0000000000000010" or temp_flag == "0000000000001010"):
+            program_counter = mem_addr
+        if opcode == "10010" and (temp_flag == "0000000000000001" or temp_flag == "0000000000001001"):
+            program_counter = mem_addr
