@@ -668,5 +668,61 @@ def TypeD(inst):
         return
     else:
         raiseError(10)
-    
+        
+        
+def TypeE(inst):
+    if (len(inst) == 2 and inst[1] in labels):
+        return
+    else:
+        raiseError(10)
+
+
+def TypeF(inst):
+    if (len(inst) == 1):
+        return
+    else:
+        raiseError(10)
+
+
+def raiseError(n):
+    print(errors[n], "in line :", (program_counter+1))  # checkkkkkkkkkkkkkkkkk
+    exit(0)
+
+
+program_counter = 0
+content = []
+count = 0
+
+while True:
+    try:
+        line_count = input()
+        if (count < 256):
+            line_count = line_count.strip()
+            if len(line_count) == 0 or line_count.isspace():
+                continue
+            content.append(line_count)
+            if "var" in line_count:
+                continue
+            if ":" in line_count:
+                s = line_count.split()
+                s[0] = s[0].replace(":", "")
+                labels[s[0]] = count
+            count += 1
+
+    except EOFError:
+        break
+
+while (program_counter < len(content)):
+    # for i in range(len(registers)):
+    #     print(i, registers[i])
+    temp_program_counter = program_counter
+    if content[program_counter].isspace():  # If empty string is read then continue the loop
+        continue
+    # perform operation(s) on given string
+    assembler(content[program_counter])
+    if (temp_program_counter == program_counter):
+        program_counter += 1
+
+if (halt_called == False):
+    raiseError(8)
     
