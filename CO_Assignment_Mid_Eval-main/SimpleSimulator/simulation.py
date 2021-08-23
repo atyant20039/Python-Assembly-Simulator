@@ -175,3 +175,64 @@ def simulator(instruction):
             program_counter = mem_addr
         if opcode == "10010" and (temp_flag == "0000000000000001" or temp_flag == "0000000000001001"):
             program_counter = mem_addr
+
+def convert(x):
+    bin_out_str = str(format(x, '08b'))
+    ans1 = bin_out_str.zfill(16)
+    return ans1
+
+
+counter = 0
+
+
+def initialisation():
+    global counter
+    # file = open("file.txt", 'r')
+    # content = file.readlines()
+
+    while True:
+        try:
+            instruction = input()  # content[counter][:-1]
+            if (counter < 256):
+                memory[counter] = instruction
+            counter += 1
+
+        except EOFError:
+            break
+
+
+def graph_plot():
+    X = plot_dict.values()
+    Y = plot_dict.keys()
+    plt.scatter(X, Y, c="blue", s=100)
+    plt.grid()
+    # fig = plt.figure()
+    # fig.savefig('saved_figure.png')
+    s = "pic" + str(rand.randint(1, 1000)) + ".png"
+    plt.savefig(s)
+    plt.show()
+
+
+initialisation()
+program_counter = 0
+plot_dict = {}
+cycle = 0
+
+while (program_counter < 256 and program_counter <= counter):
+    # array_of_program_counter.append(program_counter)
+    temp_program_counter = program_counter
+    simulator(memory[program_counter])
+    print(format(program_counter, '08b') + " " + convert(int(register_dict["000"])) + " " + convert(int(register_dict["001"])) + " " + convert(int(register_dict["010"])) + " " + convert(
+        int(register_dict["011"])) + " " + convert(int(register_dict["100"])) + " " + convert(int(register_dict["101"])) + " " + convert(int(register_dict["110"])) + " " + convert(int(register_dict["111"])))
+    plot_dict[program_counter] = cycle
+    if (memory[program_counter] == "1001100000000000"):
+        break
+    if(temp_program_counter == program_counter):
+        program_counter += 1
+    cycle += 1
+
+for i in range(0, 256):
+    print(memory[i])
+
+
+graph_plot()
