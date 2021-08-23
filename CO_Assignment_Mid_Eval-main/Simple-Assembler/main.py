@@ -285,7 +285,7 @@ def jumpeq(mem_add):
 
     program_counter = labels[mem_add] - 1
     print(opCode + exBits + str(memBits) + "\n")
-
+    
 def add(r1, r2, r3):
     opCode = "00000"
     exBits = "00"
@@ -293,17 +293,19 @@ def add(r1, r2, r3):
     list2 = []
 
     for i in (list1):
-        index = register_dist[i]
+        index = register_dict[i]
         list2.append(index)
 
     #Calculation Part#
-    temp = int(str(registers[list2[1]]), 2) + int(str(registers[list2[2]]), 2)
+    if (inside_jump == False):
+        temp = registers[list2[1]] + \
+            registers[list2[2]]
 
-    if (temp >= 0 and temp <= (2 ** 16)-1):
-        registers[list2[0]] = bin(temp).zfill(16)
-    else:
-        # global FLAGS
-        registers[7] = registers[7][0:12]+"1"+registers[7][13:]
+        if (temp >= 0 and temp <= (2 ** 16)-1):
+            registers[list2[0]] = temp
+        else:
+            # global FLAGS
+            registers[7] = registers[7][0:12]+"1"+registers[7][13:]
 
     final_bin = register_addr[list2[0]] + \
         register_addr[list2[1]] + register_addr[list2[2]]
@@ -317,17 +319,19 @@ def sub(r1, r2, r3):
     list2 = []
 
     for i in (list1):
-        index = register_dist[i]
+        index = register_dict[i]
         list2.append(index)
 
     #Calculation Part#
-    temp = int(str(registers[list2[1]]), 2) - int(str(registers[list2[2]]), 2)
-    if (temp >= 0 and temp <= (2 ** 16)-1):
-        registers[list2[0]] = bin(temp).zfill(16)
-    else:
-        registers[list2[0]] = 0
-        # global FLAGS
-        registers[7] = registers[7][0:12]+"1"+registers[7][13:]
+    if (inside_jump == False):
+        temp = registers[list2[1]] - \
+            registers[list2[2]]
+        if (temp >= 0 and temp <= (2 ** 16)-1):
+            registers[list2[0]] = temp
+        else:
+            registers[list2[0]] = 0
+            # global FLAGS
+            registers[7] = registers[7][0:12]+"1"+registers[7][13:]
 
     #printing part#
     final_bin = register_addr[list2[0]] + \
@@ -342,15 +346,16 @@ def mul(r1, r2, r3):
     list2 = []
 
     for i in (list1):
-        index = register_dist[i]
+        index = register_dict[i]
         list2.append(index)
 
-    temp = int(str(registers[list2[1]]), 2) * int(str(registers[list2[2]]), 2)
-    if (temp >= 0 and temp <= (2 ** 16)-1):
-        registers[list2[0]] = bin(temp).zfill(16)
-    else:
-        
-        registers[7] = registers[7][0:12]+"1"+registers[7][13:]
+    if (inside_jump == False):
+        temp = registers[list2[1]] * \
+            registers[list2[2]]
+        if (temp >= 0 and temp <= (2 ** 16)-1):
+            registers[list2[0]] = temp
+        else:
+            registers[7] = registers[7][0:12]+"1"+registers[7][13:]
 
     #printing part#
     final_bin = register_addr[list2[0]] + \
@@ -365,12 +370,13 @@ def div(r3, r4):
     list2 = []
 
     for i in (list1):
-        index = register_dist[i]
+        index = register_dict[i]
         list2.append(index)
 
     #Calculation Part#
-    registers[0] = int(registers[list2[0]], 2) / int(registers[list2[1]], 2)
-    registers[1] = int(registers[list2[0]], 2) % int(registers[list2[1]], 2)
+    if (inside_jump == False):
+        registers[0] = registers[list2[0]] / registers[list2[1]]
+        registers[1] = registers[list2[0]] % registers[list2[1]]
 
     #printing part#
     final_bin = register_addr[list2[0]] + \
@@ -381,11 +387,12 @@ def div(r3, r4):
 def movImm(r1, imm):
     opCode = "00010"
 
-    index = register_dist[r1]
+    index = register_dict[r1]
     regBits = register_addr[index]
     immCode = format(imm, '08b')
 
-    registers[index] = immCode.zfill(16)
+    if (inside_jump == False):
+        registers[index] = imm
 
     print(opCode + regBits + immCode + "\n")
 
@@ -397,11 +404,16 @@ def movReg(r1, r2):
     list2 = []
 
     for i in (list1):
-        index = register_dist[i]
+        index = register_dict[i]
         list2.append(index)
 
     #Calculation Part#
-    registers[list2[0]] = registers[list2[1]]
+    if (inside_jump == False):
+        if (r2 == "FLAGS"):
+            registers[list2[0]] = int(temp_flag, 2)
+        else:
+            # checkkkkkkk for flags register
+            registers[list2[0]] = registers[list2[1]]
 
     #printing part#
     final_bin = register_addr[list2[0]] + register_addr[list2[1]]
@@ -411,21 +423,20 @@ def movReg(r1, r2):
 def compare(r1, r2):
     opCode = "01110"
     exBits = "00000"
-    regBits = register_addr[register_dist[r1]] + \
-        register_addr[register_dist[r2]]
-    print(opCode + exBits + regBits + "\n")
-    if (registers[register_dist[r1]] > registers[register_dist[r2]]):
-        registers[7] = unusedBits + Flag_dict["G"]
-    if (registers[register_dist[r1]] < registers[register_dist[r2]]):
-        registers[7] = unusedBits + Flag_dict["L"]
-    if (registers[register_dist[r1]] == registers[register_dist[r2]]):
-        registers[7] = unusedBits + Flag_dict["E"]
-    
+    regBits = register_addr[register_dict[r1]] + \
+        register_addr[register_dict[r2]]
+    print(opCode + exBits + regBits + "\n")  # checkkkkkkkkkkkkkkk
+    if (inside_jump == False):
+        if (registers[register_dict[r1]] > registers[register_dict[r2]]):
+            registers[7] = registers[7][0:13] + Flag_dict["G"]
+        if (registers[register_dict[r1]] < registers[register_dict[r2]]):
+            registers[7] = registers[7][0:13] + Flag_dict["L"]
+        if (registers[register_dict[r1]] == registers[register_dict[r2]]):
+            registers[7] = registers[7][0:13] + Flag_dict["E"]
 
-    
 
 def TypeA(inst):
-    if ("r" in inst):
+    if ("r" in inst[1:]):
         raiseError(1)
 
     for i in inst[1:]:
@@ -434,7 +445,7 @@ def TypeA(inst):
             if (int(s) < 0 or int(s) > 6):
                 raiseError(1)
 
-    if (len(inst) == 4 and inst[1] in register_dist.keys() and inst[2] in register_dist.keys() and inst[3] in register_dist.keys()):
+    if (len(inst) == 4 and inst[1] in register_dict.keys() and inst[2] in register_dict.keys() and inst[3] in register_dict.keys()):
         return
     else:
         raiseError(10)
@@ -449,7 +460,7 @@ def TypeB(instr):
             raiseError(1)
 
     ins = instr[2].replace("$", "")
-    if (len(instr) == 3 and instr[1] in register_dist.keys() and "$" in instr[2] and ins.isnumeric()):
+    if (len(instr) == 3 and instr[1] in register_dict.keys() and "$" in instr[2] and ins.isnumeric()):
         return
     else:
         raiseError(10)
@@ -464,8 +475,11 @@ def TypeC(inst):
         if (s.isnumeric()):
             if (int(s) < 0 or int(s) > 6):
                 raiseError(1)
+        if (s.isalpha()):
+            if (s != "FLAGS"):
+                raiseError(1)
 
-    if (len(inst) == 3 and inst[1] in register_dist.keys() and inst[2] in register_dist.keys()):
+    if (len(inst) == 3 and inst[1] in register_dict.keys() and inst[2] in register_dict.keys()):
         return
     else:
         raiseError(10)
@@ -479,7 +493,7 @@ def TypeD(inst):
         if (int(s) < 0 or int(s) > 6):
             raiseError(1)
 
-    if (len(inst) == 3 and inst[1] in register_dist.keys() and inst[2] in variables):
+    if (len(inst) == 3 and inst[1] in register_dict.keys() and inst[2] in variables):
         return
     else:
         raiseError(10)
