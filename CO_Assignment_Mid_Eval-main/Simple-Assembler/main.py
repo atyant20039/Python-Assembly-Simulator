@@ -241,6 +241,126 @@ def assembler(instruction):
 
     else:
         raiseError(1)
+        
+        
+def getAND(r1, r2, r3):
+    opCode = "01100"
+    exBits = "00"
+    list1 = [r1, r2, r3]
+    list2 = []
+
+    for i in (list1):
+        index = register_dict[i]
+        list2.append(index)
+
+    #Calculation Part#
+    if (inside_jump == False):
+        registers[list2[0]] = registers[list2[1]] & registers[list2[2]]  # int(
+        # bin(registers[list2[1]]) & bin(registers[list2[2]]), 2)
+
+    #printing part#
+    final_bin = register_addr[list2[0]] + \
+        register_addr[list2[1]] + register_addr[list2[2]]
+    print(opCode + exBits + final_bin + "\n")
+
+
+def getOR(r1, r2, r3):
+    opCode = "01011"
+    exBits = "00"
+    list1 = [r1, r2, r3]
+    list2 = []
+
+    for i in (list1):
+        index = register_dict[i]
+        list2.append(index)
+
+    #Calculation Part#
+    if (inside_jump == False):
+        registers[list2[0]] = (registers[list2[1]] | registers[list2[2]])
+
+    #printing part#
+    final_bin = register_addr[list2[0]] + \
+        register_addr[list2[1]] + register_addr[list2[2]]
+    print(opCode + exBits + final_bin + "\n")
+
+
+def getXOR(r1, r2, r3):
+    opCode = "01010"
+    exBits = "00"
+    list1 = [r1, r2, r3]
+    list2 = []
+
+    for i in (list1):
+        index = register_dict[i]
+        list2.append(index)
+
+    #Calculation Part#
+    if (inside_jump == False):
+        registers[list2[0]] = (registers[list2[1]] ^ registers[list2[2]])
+
+    #printing part#
+    final_bin = register_addr[list2[0]] + \
+        register_addr[list2[1]] + register_addr[list2[2]]
+    print(opCode + exBits + final_bin + "\n")
+
+
+def shiftRIGHT(r1, imm):
+    opCode = "01000"
+    index = register_dict[r1]
+    regCode = register_addr[index]
+    immCode = format(imm, '08b')
+    print(opCode + regCode + immCode + "\n")
+    if (inside_jump == False):
+        registers[index] = registers[index] >> imm
+
+
+def shiftLEFT(r1, imm):
+    opCode = "01001"
+    index = register_dict[r1]
+    regCode = register_addr[index]
+    immCode = format(imm, '08b')
+    print(opCode + regCode + immCode + "\n")
+    if (inside_jump == False):
+        registers[index] = registers[index] << imm
+
+
+def halt():
+    opCode = "10011"
+    exBits = "0"*11
+    print(opCode + exBits + "\n")
+
+
+def getINVERT(r1, r2):
+    opCode = "01101"
+    exBits = "00000"
+    list1 = [r1, r2]
+    list2 = []
+
+    for i in (list1):
+        index = register_dict[i]
+        list2.append(index)
+
+    #Calculation Part#
+    if (inside_jump == False):
+        binary_string = format(registers[list2[1]], 'b').zfill(
+            16)    # correct this
+        for i in range(len(binary_string)):
+            if (i == len(binary_string) - 1):
+                if (binary_string[i] == "0"):
+                    binary_string = binary_string[0:-1] + "1"
+                else:
+                    binary_string = binary_string[0:-1] + "0"
+            elif (binary_string[i] == "0"):
+                binary_string = binary_string[0:i] + "1" + binary_string[i+1:]
+            else:
+                binary_string = binary_string[0:i] + "0" + binary_string[i+1:]
+
+        value = int(binary_string, 2)
+        registers[list2[0]] = value
+    #printing part#
+
+    final_bin = register_addr[list2[0]] + register_addr[list2[1]]
+    print(opCode + exBits + final_bin + "\n")
 
 
 def load(r1, mem_add):
@@ -335,3 +455,6 @@ def jumpeq(mem_add):
                 temp_program_counter += 1
             inside_jump = False
     print(opCode + exBits + str(memBits) + "\n")
+    
+    
+    
