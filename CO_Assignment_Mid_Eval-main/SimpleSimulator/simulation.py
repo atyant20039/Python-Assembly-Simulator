@@ -15,7 +15,6 @@ reg5 = 0
 reg6 = 0
 FLAGS = unusedBits + "0000"
 
-# register_values = [reg0, reg1, reg2, reg3, reg4, reg5, reg6, FLAGS]
 register_dict = {"000": reg0, "001": reg1, "010": reg2,
                  "011": reg3, "100": reg4, "101": reg5, "110": reg6, "111": FLAGS}
 Flag_dict = {"V": "1000", "L": "100", "G": "010", "E": "001"}
@@ -54,7 +53,7 @@ def simulator(instruction):
         reg2_value = register_dict[instruction[10:13]]
         reg3_value = register_dict[instruction[13:]]
 
-        if opcode == "00000":  # addition   # overflow pending
+        if opcode == "00000":  # addition   
             check = reg2_value + reg3_value
             if (check < 0 or check > 255):
                 register_dict["111"] = register_dict["111"][0:12] + \
@@ -66,7 +65,7 @@ def simulator(instruction):
             else:
                 register_dict[instruction[7:10]] = check
 
-        if opcode == "00001":  # substraction   # overflow pending
+        if opcode == "00001":  # substraction  
             check = reg2_value - reg3_value
             if (check < 0 or check > 255):
                 register_dict["111"] = register_dict["111"][0:12] + \
@@ -75,7 +74,7 @@ def simulator(instruction):
             else:
                 register_dict[instruction[7:10]] = check
 
-        if opcode == "00110":  # multiply   # overflow pending
+        if opcode == "00110":  # multiply  
             check = reg2_value * reg3_value
             if (check < 0 or check > 255):
                 register_dict["111"] = register_dict["111"][0:12] + \
@@ -99,9 +98,7 @@ def simulator(instruction):
             
     if (type == "b"):
         reg1_value = register_dict[instruction[5:8]]
-        # immidiate value converted to Integer from String
         imm = int(instruction[8:], 2)
-
         if opcode == "00010":  # move Imm
             register_dict[instruction[5:8]] = imm
         if opcode == "01000":  # right shift
@@ -151,11 +148,9 @@ def simulator(instruction):
 
     if (type == "d"):
         reg1_value = register_dict[instruction[5:8]]
-        # Memory address converted to Integer from String
         mem_addr = int(instruction[8:], 2)
         global cycle
         if opcode == "00100":  # load
-            # Need to be resolve
             plot_dict[mem_addr] = cycle
             register_dict[instruction[5:8]] = memory[mem_addr]
         if opcode == "00101":  # store
@@ -165,7 +160,6 @@ def simulator(instruction):
             
             
     if (type == "e"):
-        # Memory address converted to Integer from String
         mem_addr = int(instruction[8:], 2)
         if opcode == "01111":
             program_counter = mem_addr
@@ -187,12 +181,10 @@ counter = 0
 
 def initialisation():
     global counter
-    # file = open("file.txt", 'r')
-    # content = file.readlines()
 
     while True:
         try:
-            instruction = input()  # content[counter][:-1]
+            instruction = input()
             if (counter < 256):
                 memory[counter] = instruction
             counter += 1
@@ -206,8 +198,6 @@ def graph_plot():
     Y = plot_dict.keys()
     plt.scatter(X, Y, c="blue", s=100)
     plt.grid()
-    # fig = plt.figure()
-    # fig.savefig('saved_figure.png')
     s = "pic" + str(rand.randint(1, 1000)) + ".png"
     plt.savefig(s)
     plt.show()
@@ -219,7 +209,6 @@ plot_dict = {}
 cycle = 0
 
 while (program_counter < 256 and program_counter <= counter):
-    # array_of_program_counter.append(program_counter)
     temp_program_counter = program_counter
     simulator(memory[program_counter])
     print(format(program_counter, '08b') + " " + convert(int(register_dict["000"])) + " " + convert(int(register_dict["001"])) + " " + convert(int(register_dict["010"])) + " " + convert(
