@@ -96,3 +96,69 @@ def simulator(instruction):
         if opcode == "01100":  # and
             register_dict[instruction[7:10]] = int(
                 bin(reg2_value & reg3_value), 2)
+            
+    if (type == "b"):
+        reg1_value = register_dict[instruction[5:8]]
+        # immidiate value converted to Integer from String
+        imm = int(instruction[8:], 2)
+
+        if opcode == "00010":  # move Imm
+            register_dict[instruction[5:8]] = imm
+        if opcode == "01000":  # right shift
+            register_dict[instruction[5:8]] = reg1_value >> imm
+        if opcode == "01001":  # left shift
+            register_dict[instruction[5:8]] = reg1_value << imm
+
+    if (type == "c"):
+        reg1_value = register_dict[instruction[10:13]]
+        if (instruction[13:] == "111"):
+            reg2_value = int(temp_flag, 2)
+        else:
+            reg2_value = register_dict[instruction[13:]]
+
+        if opcode == "00111":  # divide
+            register_dict["000"] = reg1_value / reg2_value
+            register_dict["001"] = reg1_value % reg2_value
+        if opcode == "00011":  # move reg
+            register_dict[instruction[10:13]] = reg2_value
+        if opcode == "01101":  # invert
+            binary_string = format(reg2_value, '08b').zfill(16)
+            for i in range(len(binary_string)):
+                if (i == len(binary_string) - 1):
+                    if (binary_string[i] == "0"):
+                        binary_string = binary_string[0:-1] + "1"
+                    else:
+                        binary_string = binary_string[0:-1] + "0"
+                elif (binary_string[i] == "0"):
+                    binary_string = binary_string[0:i] + \
+                        "1" + binary_string[i+1:]
+                else:
+                    binary_string = binary_string[0:i] + \
+                        "0" + binary_string[i+1:]
+            value = int(binary_string, 2)
+            register_dict[instruction[10:13]] = value
+
+        if opcode == "01110":  # compare
+            if (int(reg1_value) > int(reg2_value)):
+                register_dict["111"] = register_dict["111"][0:13] + \
+                    Flag_dict["G"]
+            if (int(reg1_value) < int(reg2_value)):
+                register_dict["111"] = register_dict["111"][0:13] + \
+                    Flag_dict["L"]
+            if (int(reg1_value) == int(reg2_value)):
+                register_dict["111"] = register_dict["111"][0:13] + \
+                    Flag_dict["E"]
+
+    if (type == "d"):
+        reg1_value = register_dict[instruction[5:8]]
+        # Memory address converted to Integer from String
+        mem_addr = int(instruction[8:], 2)
+        global cycle
+        if opcode == "00100":  # load
+            # Need to be resolve
+            plot_dict[mem_addr] = cycle
+            register_dict[instruction[5:8]] = memory[mem_addr]
+        if opcode == "00101":  # store
+            value = format(reg1_value, '08b').zfill(16)
+            plot_dict[mem_addr] = cycle
+            memory[mem_addr] = value
